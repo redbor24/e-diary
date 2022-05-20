@@ -47,12 +47,20 @@ commendations = [
 
 
 def fix_marks(kid_name):
-    kid = get_schoolkid(kid_name)
+    try:
+        kid = Schoolkid.objects.get(full_name__contains=kid_name)
+    except MultipleObjectsReturned as e1:
+        print(f'Найдено несколько учеников "{kid_name}"! Укажите более точное ФИО.')
+        return
+    except ObjectDoesNotExist as e2:
+        print(f'Ученик "{kid_name}" не найден!')
+        return
+
     bad_points = Mark.objects.filter(schoolkid=kid, points__lt=4)
     bad_points.update(points=5)
 
 
-def get_schoolkid(kid_name):
+def create_commendation(kid_name, subject_name):
     try:
         kid = Schoolkid.objects.get(full_name__contains=kid_name)
     except MultipleObjectsReturned:
@@ -60,13 +68,8 @@ def get_schoolkid(kid_name):
         return
     except ObjectDoesNotExist:
         print(f'Ученик "{kid_name}" не найден!')
-        return None
+        return
 
-    return kid
-
-
-def create_commendation(kid_name, subject_name):
-    kid = get_schoolkid(kid_name)
     try:
         subject = Subject.objects.get(title=subject_name, year_of_study=kid.year_of_study)
     except ObjectDoesNotExist:
@@ -75,13 +78,20 @@ def create_commendation(kid_name, subject_name):
 
     lesson = Lesson.objects.filter(year_of_study=kid.year_of_study, group_letter=kid.group_letter,
                                    subject__title=subject_name).order_by('-date')[0]
-    commendation = Commendation(text=choices(commendations)[0], created=lesson.date,
-                                schoolkid=kid, subject=subject, teacher=lesson.teacher)
-    commendation.save()
+    Commendation(text=choices(commendations)[0], created=lesson.date,
+                 schoolkid=kid, subject=subject, teacher=lesson.teacher).save()
 
 
 def remove_chastisements(kid_name):
-    kid = get_schoolkid(kid_name)
+    try:
+        kid = Schoolkid.objects.get(full_name__contains=kid_name)
+    except MultipleObjectsReturned as e1:
+        print(f'Найдено несколько учеников "{kid_name}"! Укажите более точное ФИО.')
+        return
+    except ObjectDoesNotExist as e2:
+        print(f'Ученик "{kid_name}" не найден!')
+        return
+
     Chastisement.objects.filter(schoolkid=kid).delete()
 
 
