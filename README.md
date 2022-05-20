@@ -31,7 +31,13 @@
  3. Замена плохих оценок на пятёрки
 
 #### 1. Режим "Создание похвалы от учителя"
-Формат вызова: `python ediaryhack.py create_commend kid subject`
+Формат вызова:
+
+`python ediaryhack.py create_commend kid subject`
+
+Получение справки по режиму:
+
+`python ediaryhack.py create_commend -h`
 
 ##### Примеры:
 
@@ -44,7 +50,13 @@
 `python ediaryhack.py create_commend "Фролов Иван" "Изобразительное искусство"`
 
 #### 2. Режим "Удаление замечаний от учителей"
-Формат вызова: `python ediaryhack.py remove_chast kid`
+Формат вызова:
+
+`python ediaryhack.py remove_chast kid`
+
+Получение справки по режиму:
+
+`python ediaryhack.py remove_chast -h`
 
 ##### Примеры:
 
@@ -55,7 +67,13 @@
 `python ediaryhack.py remove_chast "Галкин Изяслав Филиппович"`
 
 #### 3. Режим "Замена плохих оценок на пятёрки"
-Формат вызова: `python ediaryhack.py fix_marks kid`
+Формат вызова:
+
+`python ediaryhack.py fix_marks kid`
+
+Получение справки по режиму:
+
+`python ediaryhack.py fix_marks -h`
 
 ##### Примеры:
 
