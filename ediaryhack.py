@@ -1,7 +1,8 @@
 import argparse
-from random import choices
 import os
 import sys
+from random import choices
+from textwrap import dedent
 
 import django
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -9,7 +10,8 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 django.setup()
 
-from datacenter.models import Chastisement, Commendation, Lesson, Schoolkid, Subject, Mark
+from datacenter.models import (Chastisement, Commendation, Lesson, Mark,
+                               Schoolkid, Subject)
 
 commendations = [
     'Молодец!',
@@ -96,11 +98,12 @@ def remove_chastisements(kid_name):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog='EDiary bad data corrector',
-        description='''Программа для исправления данных в электронном дневнике ученика:
-замена всех плохих оценок на пятёрки; удаление замечаний учителей; создание похвалы от учителя''',
-        epilog='''Автор не несёт никакой ответственности за последствия корректировок эл.дневника!!!
-Все изменения вы делаете на свой страх и риск!!!
-(C) redbor24''',
+        description=dedent('''\
+Программа для исправления данных в электронном дневнике ученика:
+замена всех плохих оценок на пятёрки; удаление замечаний учителей; создание похвалы от учителя.'''),
+        epilog=dedent('''\
+Автор не несёт никакой ответственности за последствия корректировок эл.дневника!!!
+Все изменения вы делаете на свой страх и риск!!! (C)redbor24'''),
         add_help=False
     )
     subparser = parser.add_subparsers(
@@ -116,38 +119,47 @@ if __name__ == '__main__':
         'create_commend',
         add_help=False,
         help='Запуск в режиме "Создание похвалы от учителя"',
-        description='''Запуск в режиме "Создание похвалы от учителя".
+        description=dedent('''\
+Запуск в режиме "Создание похвалы от учителя".
 В этом режиме программа создаёт ученику похвалу от учителя со случайным текстом.''')
+    )
     create_commend_group = parser_create_commend.add_argument_group(title='Параметры')
     create_commend_group.add_argument('--help', '-h', action='help', help='Справка')
     create_commend_group.add_argument(
         'kid',
-        help='ФИО ученика. Раздельные имя, отчество и фамилия нужно взять в двойные кавычки. Регистр важен!')
+        help='ФИО ученика. Раздельные имя, отчество и фамилия нужно взять в двойные кавычки. Регистр важен!'
+    )
     create_commend_group.add_argument('subject', help='Наименование предмета с большой буквы')
 
     parser_remove_chast = subparser.add_parser(
         'remove_chast',
         add_help=False,
         help='Запуск в режиме "Удаление замечаний от учителей"',
-        description='''Запуск в режиме "Удаление замечаний от учителей".
+        description=dedent('''\
+Запуск в режиме "Удаление замечаний от учителей".
 В этом режиме программа удаляет у ученика все замечания от учителей.''')
+    )
     remove_chast_group = parser_remove_chast.add_argument_group(title='Параметры')
     remove_chast_group.add_argument('--help', '-h', action='help', help='Справка')
     remove_chast_group.add_argument(
         'kid',
-        help='ФИО ученика. Раздельные имя, отчество и фамилия нужно взять в двойные кавычки. Регистр важен!')
+        help='ФИО ученика. Раздельные имя, отчество и фамилия нужно взять в двойные кавычки. Регистр важен!'
+    )
 
     parser_fix_marks = subparser.add_parser(
         'fix_marks',
         add_help=False,
         help='Запуск в режиме "Замена плохих оценок на пятёрки"',
-        description='''Запуск в режиме "Замена плохих оценок на пятёрки".
+        description=dedent('''\
+Запуск в режиме "Замена плохих оценок на пятёрки".
 В этом режиме программа заменяет ученику на пятёрки все оценки ниже четвёрки.''')
+    )
     fix_marks_group = parser_fix_marks.add_argument_group(title='Параметры')
     fix_marks_group.add_argument('--help', '-h', action='help', help='Справка')
     fix_marks_group.add_argument(
         'kid',
-        help='ФИО ученика. Раздельные имя, отчество и фамилия нужно взять в двойные кавычки. Регистр важен!')
+        help='ФИО ученика. Раздельные имя, отчество и фамилия нужно взять в двойные кавычки. Регистр важен!'
+    )
 
     namespace = parser.parse_args(sys.argv[1:])
 
