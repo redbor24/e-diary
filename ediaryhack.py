@@ -49,10 +49,10 @@ commendations = [
 def get_schoolkid(kid_name):
     try:
         return Schoolkid.objects.get(full_name__contains=kid_name)
-    except MultipleObjectsReturned as e1:
+    except MultipleObjectsReturned:
         print(f'Найдено несколько учеников "{kid_name}"! Укажите более точное ФИО.')
         return
-    except ObjectDoesNotExist as e2:
+    except ObjectDoesNotExist:
         print(f'Ученик "{kid_name}" не найден!')
         return
 
@@ -73,10 +73,18 @@ def create_commendation(kid_name, subject_name):
             print(f'Ошибка! Предмет "{subject_name}" не найден.')
             return
 
-        lesson = Lesson.objects.filter(year_of_study=kid.year_of_study, group_letter=kid.group_letter,
-                                       subject__title=subject_name).order_by('-date')[0]
-        Commendation(text=choices(commendations)[0], created=lesson.date,
-                     schoolkid=kid, subject=subject, teacher=lesson.teacher).save()
+        lesson = Lesson.objects.filter(
+            year_of_study=kid.year_of_study,
+            group_letter=kid.group_letter,
+            subject__title=subject_name
+        ).order_by('-date')[0]
+        Commendation(
+            text=choices(commendations)[0],
+            created=lesson.date,
+            schoolkid=kid,
+            subject=subject,
+            teacher=lesson.teacher
+        ).save()
 
 
 def remove_chastisements(kid_name):
