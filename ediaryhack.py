@@ -46,9 +46,9 @@ commendations = [
 ]
 
 
-def fix_marks(kid_name):
+def get_schoolkid(kid_name):
     try:
-        kid = Schoolkid.objects.get(full_name__contains=kid_name)
+        return Schoolkid.objects.get(full_name__contains=kid_name)
     except MultipleObjectsReturned as e1:
         print(f'Найдено несколько учеников "{kid_name}"! Укажите более точное ФИО.')
         return
@@ -56,43 +56,33 @@ def fix_marks(kid_name):
         print(f'Ученик "{kid_name}" не найден!')
         return
 
-    bad_points = Mark.objects.filter(schoolkid=kid, points__lt=4)
-    bad_points.update(points=5)
+
+def fix_marks(kid_name):
+    kid = get_schoolkid(kid_name)
+    if kid:
+        bad_points = Mark.objects.filter(schoolkid=kid, points__lt=4)
+        bad_points.update(points=5)
 
 
 def create_commendation(kid_name, subject_name):
-    try:
-        kid = Schoolkid.objects.get(full_name__contains=kid_name)
-    except MultipleObjectsReturned:
-        print(f'Найдено несколько учеников "{kid_name}"! Укажите более точное ФИО.')
-        return
-    except ObjectDoesNotExist:
-        print(f'Ученик "{kid_name}" не найден!')
-        return
+    kid = get_schoolkid(kid_name)
+    if kid:
+        try:
+            subject = Subject.objects.get(title=subject_name, year_of_study=kid.year_of_study)
+        except ObjectDoesNotExist:
+            print(f'Ошибка! Предмет "{subject_name}" не найден.')
+            return
 
-    try:
-        subject = Subject.objects.get(title=subject_name, year_of_study=kid.year_of_study)
-    except ObjectDoesNotExist:
-        print(f'Ошибка! Предмет "{subject_name}" не найден.')
-        return
-
-    lesson = Lesson.objects.filter(year_of_study=kid.year_of_study, group_letter=kid.group_letter,
-                                   subject__title=subject_name).order_by('-date')[0]
-    Commendation(text=choices(commendations)[0], created=lesson.date,
-                 schoolkid=kid, subject=subject, teacher=lesson.teacher).save()
+        lesson = Lesson.objects.filter(year_of_study=kid.year_of_study, group_letter=kid.group_letter,
+                                       subject__title=subject_name).order_by('-date')[0]
+        Commendation(text=choices(commendations)[0], created=lesson.date,
+                     schoolkid=kid, subject=subject, teacher=lesson.teacher).save()
 
 
 def remove_chastisements(kid_name):
-    try:
-        kid = Schoolkid.objects.get(full_name__contains=kid_name)
-    except MultipleObjectsReturned as e1:
-        print(f'Найдено несколько учеников "{kid_name}"! Укажите более точное ФИО.')
-        return
-    except ObjectDoesNotExist as e2:
-        print(f'Ученик "{kid_name}" не найден!')
-        return
-
-    Chastisement.objects.filter(schoolkid=kid).delete()
+    kid = get_schoolkid(kid_name)
+    if kid:
+        Chastisement.objects.filter(schoolkid=kid).delete()
 
 
 if __name__ == '__main__':
